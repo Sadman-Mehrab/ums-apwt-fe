@@ -33,6 +33,13 @@ export default function Page() {
     return <div></div>;
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("email");
+    router.push("/faculty/login");
+  };
+
   return (
     <AuthGuard>
       <div className="overflow-hidden bg-white shadow sm:rounded-lg">
@@ -53,27 +60,49 @@ export default function Page() {
         </div>
         <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
           <dl className="sm:divide-y sm:divide-gray-200">
-          <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
+            <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
               <button
                 type="button"
                 className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                onClick={() => {router.push("/faculty/grades")}}
+                onClick={() => {
+                  router.push("/faculty/grades");
+                }}
               >
                 Grade Analytics
               </button>
               <button
                 type="button"
                 className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                onClick={() => {router.push("/faculty/create-article")}}
+                onClick={() => {
+                  router.push("/faculty/sections");
+                }}
+              >
+                View Sections
+              </button>
+              <button
+                type="button"
+                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                onClick={() => {
+                  router.push("/faculty/create-article");
+                }}
               >
                 Create Article
               </button>
               <button
                 type="button"
                 className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                onClick={() => {router.push("/faculty/view-articles")}}
+                onClick={() => {
+                  router.push("/article");
+                }}
               >
                 View Articles
+              </button>
+              <button
+                type="button"
+                className="bg-red-100 inline-flex items-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                onClick={() => handleLogout()}
+              >
+                Log Out
               </button>
             </div>
             <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:py-5 sm:px-6">
@@ -127,7 +156,6 @@ export default function Page() {
                 {user.researchInterests.join(", ")}
               </dd>
             </div>
-            
           </dl>
         </div>
       </div>

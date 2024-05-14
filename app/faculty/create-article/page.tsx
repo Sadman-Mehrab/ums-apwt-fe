@@ -5,15 +5,15 @@ import { useRouter } from "next/navigation";
 import { Toaster, toast } from "react-hot-toast";
 
 interface FormData {
-  email: string;
-  password: string;
+  title: string;
+  content: string;
 }
 
 export default function Page() {
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
-    email: "",
-    password: "",
+    title: "",
+    content: "",
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -27,48 +27,31 @@ export default function Page() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (!formData.email || !formData.password) {
+    if (!formData.title || !formData.content) {
       toast.error("Please fill all credentials.");
       return;
     }
 
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!formData.password || !passwordRegex.test(formData.password)) {
-      toast.error(
-        "Password must be minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character."
-      );
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email || !emailRegex.test(formData.email)) {
-      toast.error("Please enter a valid email.");
-      return;
-    }
-
     try {
-      const response = await axios.post(
-        "http://localhost:3000/faculty/authentication/login",
-        formData,
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      );
+      const token = localStorage.getItem("access_token");
+      if (token) {
+        const response = await axios.post(
+          "http://localhost:3000/article",
+          {title: formData.title, content: formData.content, datePublished: new Date().toJSON().slice(0, 10)},
+          {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              "Authorization": `Bearer ${token}`,
+            },
+          }
+        );
+      }
 
-      const token = response.data;
-
-      localStorage.setItem("access_token", token.access_token);
-      localStorage.setItem("user_id", token.user_id);
-      localStorage.setItem("user_email", formData.password);
-
-      toast.success("Sign in successful");
-      router.push("/faculty/dashboard");
+      toast.success("Post Successful");
+      router.push("/article");
     } catch (error) {
-      console.error("Error signing in:", error);
-      toast.error("Sign in failed. Please check your credentials.");
+      console.error("Error Posting:", error);
+      toast.error("Post Failed");
     }
   };
 
@@ -79,38 +62,37 @@ export default function Page() {
         <div className="w-full max-w-md space-y-8">
           <div>
             <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-              Sign In as Faculty
+              Add Article
             </h2>
           </div>
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="-space-y-px rounded-md shadow-sm">
               <div>
                 <label htmlFor="email-address" className="sr-only">
-                  Email address
+                  Title
                 </label>
                 <input
-                  id="email-address"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
+                  id="title"
+                  name="title"
+                  type="text"
                   className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                  placeholder="Email address"
-                  value={formData.email}
+                  placeholder="Title"
+                  value={formData.title}
                   onChange={handleChange}
                 />
               </div>
               <div>
                 <label htmlFor="password" className="sr-only">
-                  Password
+                  Content
                 </label>
                 <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
+                  id="content"
+                  name="content"
+                  type="content"
+                  autoComplete="content"
                   className="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                  placeholder="Password"
-                  value={formData.password}
+                  placeholder="Content"
+                  value={formData.content}
                   onChange={handleChange}
                 />
               </div>
@@ -121,7 +103,7 @@ export default function Page() {
                 type="submit"
                 className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
-                Sign in
+                Add
               </button>
             </div>
           </form>
